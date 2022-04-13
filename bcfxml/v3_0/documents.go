@@ -8,7 +8,7 @@ import (
 
 type DocumentInfo struct {
 	XMLName   xml.Name   `xml:"DocumentInfo"`
-	Documents []Document `xml:"Documents>Document,omitempty" json:"Documents"`
+	Documents []*Document `xml:"Documents>Document,omitempty" json:"Documents"`
 }
 
 type sDocumentInfo struct {

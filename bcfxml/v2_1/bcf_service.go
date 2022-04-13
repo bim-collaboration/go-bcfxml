@@ -1,4 +1,4 @@
-package v3_0
+package v2_1
 
 import (
 	"errors"
@@ -7,16 +7,14 @@ import (
 
 type BcfData struct {
 	ProjectInfo *ProjectInfo
-	DocumentInfo *DocumentInfo
 	Extensions *Extensions
 	Markups []*Markup
-	Visinfos map[string][]*VisualizationInfo
+	Visinfos map[string]map[string]*VisualizationInfo
 }
 
 
 type sBcfService struct {
 	InsProjectInfo *sProjectInfo
-	InsDocumentInfo *sDocumentInfo
 	InsExtensions *sExtensions
 	InsMarkup *sMarkup
 	InsVisualizationInfo *sVisualizationInfo
@@ -25,7 +23,6 @@ type sBcfService struct {
 var (
 	insBcfService=sBcfService{
 		InsProjectInfo:newInsProjectInfo(),
-		InsDocumentInfo:newInsDocumentInfo(),
 		InsExtensions:newInsExtensions(),
 		InsMarkup:newInsMarkup(),
 		InsVisualizationInfo:newInsVisualizationInfo(),
@@ -47,12 +44,8 @@ func (s *sBcfService) ReadFoldData(fold string) (out *BcfData, err error) {
 	if da,err:=s.InsProjectInfo.ReadFileProjectInfo(fold+"/project.bcfp");err==nil {
 		out.ProjectInfo=da
 	}
-	//DocumentInfo
-	if da,err:=s.InsDocumentInfo.ReadFileDocumentInfo(fold+"/documents.xml");err==nil {
-		out.DocumentInfo=da
-	}
 	//Extensions
-	if da,err:=s.InsExtensions.ReadFileExtensions(fold+"/extensions.xml");err==nil {
+	if da,err:=s.InsExtensions.ReadFileExtensions(fold+"/extensions.xsd");err==nil {
 		out.Extensions=da
 	}
 	//loop markup.bcf
@@ -74,14 +67,14 @@ func (s *sBcfService) ReadFoldData(fold string) (out *BcfData, err error) {
 		}
 	}
 	//loop VisualizationInfo
-	out.Visinfos=make(map[string][]*VisualizationInfo)
+	out.Visinfos=make(map[string]map[string]*VisualizationInfo)
 	for _,m:=range out.Markups{
-		vis:=make([]*VisualizationInfo,0)
-		for _,vi:=range m.Topic.ViewPoints{
+		vis:=make(map[string]*VisualizationInfo,0)
+		for _,vi:=range m.Viewpoints{
 			//Viewpoint
 			pathVisinfo:=fold+"/"+m.Topic.Guid+"/"+vi.Viewpoint
 			if da,err:=s.InsVisualizationInfo.ReadFileVisualizationInfo(pathVisinfo);err==nil {
-				vis=append(vis,da)
+				vis[vi.Viewpoint]=da
 			}
 		}
 		out.Visinfos[m.Topic.Guid]=vis
@@ -101,10 +94,8 @@ func (s *sBcfService) WriteFoldData(fold string,in *BcfData) (err error) {
 	}
 	//ProjectInfo
 	s.InsProjectInfo.WriteFileProjectInfo(fold+"/project.bcfp",in.ProjectInfo)
-	//DocumentInfo
-	s.InsDocumentInfo.WriteFileDocumentInfo(fold+"/documents.xml",in.DocumentInfo)
 	//Extensions
-	s.InsExtensions.WriteFileExtensions(fold+"/extensions.xml",in.Extensions)
+	s.InsExtensions.WriteFileExtensions(fold+"/extensions.xsd",in.Extensions)
 	//loop markup.bcf
 	for _,m:=range in.Markups{
 		err=gfile.Mkdir(fold+"/"+m.Topic.Guid)
@@ -115,8 +106,8 @@ func (s *sBcfService) WriteFoldData(fold string,in *BcfData) (err error) {
 	}
 	//loop viewpoint
 	for k,vis:=range in.Visinfos{
-		for _,vi:=range vis{
-			s.InsVisualizationInfo.WriteFileVisualizationInfo(fold+"/"+k+"/Viewpoint_"+vi.Guid+".bcfv",vi)
+		for pa,vi:=range vis{
+			s.InsVisualizationInfo.WriteFileVisualizationInfo(fold+"/"+k+"/"+pa,vi)
 		}
 	}
 	err=nil

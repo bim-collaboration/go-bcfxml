@@ -1,4 +1,4 @@
-package v3_0
+package v2_1
 
 import (
 	"encoding/xml"
@@ -8,13 +8,13 @@ import (
 
 type VisualizationInfo struct {
 	XMLName           xml.Name          `xml:"VisualizationInfo"`
-	Guid              string            `xml:"Guid,attr"`
-	Components        Components        `xml:"Components,omitempty"`
-	OrthogonalCamera  OrthogonalCamera  `xml:"OrthogonalCamera,omitempty"`
-	PerspectiveCamera PerspectiveCamera `xml:"PerspectiveCamera,omitempty"`
-	Lines             Line              `xml:"Lines>Line,omitempty"`
-	ClippingPlanes    ClippingPlane     `xml:"ClippingPlanes>ClippingPlane,omitempty"`
-	Bitmaps           Bitmap            `xml:"Bitmaps>Bitmap,omitempty"`
+	Components        *Components        `xml:"Components,omitempty"`
+	OrthogonalCamera  *OrthogonalCamera  `xml:"OrthogonalCamera,omitempty"`
+	PerspectiveCamera *PerspectiveCamera `xml:"PerspectiveCamera,omitempty"`
+	Lines             *Line              `xml:"Lines>Line,omitempty"`
+	ClippingPlanes    *ClippingPlane     `xml:"ClippingPlanes>ClippingPlane,omitempty"`
+	Bitmap           []*Bitmap            `xml:"Bitmap,omitempty"`
+	Guid           string            `xml:"Guid,attr"`
 }
 
 type sVisualizationInfo struct {

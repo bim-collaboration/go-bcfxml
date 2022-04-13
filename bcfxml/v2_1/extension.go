@@ -1,4 +1,4 @@
-package v3_0
+package v2_1
 
 import (
 	"encoding/xml"
@@ -7,15 +7,13 @@ import (
 )
 
 type Extensions struct {
-	XMLName     xml.Name `xml:"Extensions"`
-	TopicTypes   []string `xml:"TopicTypes>TopicType,omitempty"`
-	TopicStatuses []string `xml:"TopicStatuses>TopicStatus,omitempty"`
-	Priorities    []string `xml:"Priorities>Priority,omitempty"`
-	TopicLabels  []string `xml:"TopicLabels>TopicLabel,omitempty"`
-	Users        []string `xml:"Users>User,omitempty"`
-	SnippetTypes []string `xml:"SnippetTypes>SnippetType,omitempty"`
-	Stages       []string `xml:"Stages>Stage,omitempty"`
+	XMLName     xml.Name `xml:"schema"`
+	Redefine    *Redefine        `xml:"redefine,omitempty"`
+	Xmlns    string        `xml:"xmlns,attr"`
 }
+
+
+
 
 type sExtensions struct {
 }

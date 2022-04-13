@@ -1,4 +1,4 @@
-package v3_0
+package v2_1
 
 import (
 	"encoding/xml"
@@ -8,8 +8,10 @@ import (
 
 type Markup struct {
 	XMLName    xml.Name    `xml:"Markup"`
-	Header     []*File      `xml:"Header>Files>File,omitempty"`
+	Header     []*File      `xml:"Header>File,omitempty"`
 	Topic      *Topic       `xml:"Topic"`
+	Comment      []*Comment       `xml:"Comment,omitempty"`
+	Viewpoints      []*ViewPoint       `xml:"Viewpoints,omitempty"`
 }
 
 type sMarkup struct {

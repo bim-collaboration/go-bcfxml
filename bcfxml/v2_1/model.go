@@ -1,4 +1,4 @@
-package v3_0
+package v2_1
 
 import "encoding/xml"
 
@@ -7,10 +7,27 @@ import "encoding/xml"
 type Document struct {
 	Guid        string `xml:"Guid,attr"`
 	Description string `xml:"Description,omitempty"`
-	Filename    string `xml:"Filename"`
+	Filename    string `xml:"Filename,omitempty"`
 }
 
 //**************************************extensions*********************************//
+type Redefine struct {
+	SimpleType []*SimpleType   `xml:"simpleType"`
+	SchemaLocation      string   `xml:"schemaLocation,attr"`
+}
+
+type SimpleType struct {
+	Restriction *Restriction   `xml:"restriction"`
+	Name      string   `xml:"name,attr"`
+}
+type Restriction struct {
+	Enumeration []*Enumeration   `xml:"enumeration"`
+	Base      string   `xml:"base,attr"`
+}
+type Enumeration struct {
+	Value string   `xml:"value,attr"`
+}
+
 
 //**************************************project*********************************//
 type Project struct {
@@ -34,7 +51,7 @@ type BimSnippet struct {
 
 type Topic struct {
 	XMLName            xml.Name            `xml:"Topic"`
-	ReferenceLinks     []string            `xml:"ReferenceLinks>ReferenceLink,omitempty"`
+	ReferenceLink     []string            `xml:"ReferenceLink,omitempty"`
 	Title              string              `xml:"Title"`
 	Priority           string              `xml:"Priority,omitempty"`
 	Index              string              `xml:"Index,omitempty"`
@@ -48,22 +65,19 @@ type Topic struct {
 	Stage              string              `xml:"Stage,omitempty"`
 	Description        string              `xml:"Description,omitempty"`
 	BimSnippet         *BimSnippet          `xml:"BimSnippet,omitempty"`
-	DocumentReferences []*DocumentReference `xml:"DocumentReferences>DocumentReference,omitempty"`
-	RelatedTopics      []*RelatedTopic      `xml:"RelatedTopics>RelatedTopic,omitempty"`
-	Comments           []*Comment           `xml:"Comments>Comment,omitempty"`
-	ViewPoints         []*ViewPoint         `xml:"Viewpoints>ViewPoint,omitempty"`
+	DocumentReference []*DocumentReference `xml:"DocumentReference,omitempty"`
+	RelatedTopic      []*RelatedTopic      `xml:"RelatedTopic,omitempty"`
 	Guid               string              `xml:"Guid,attr"`
-	ServerAssignedId   string              `xml:"ServerAssignedId,attr,omitempty"`
-	TopicType          string              `xml:"TopicType,attr"`
-	TopicStatus        string              `xml:"TopicStatus,attr"`
+	TopicType          string              `xml:"TopicType,attr,omitempty"`
+	TopicStatus        string              `xml:"TopicStatus,attr,omitempty"`
 }
 
 type File struct {
 	Filename                   string `xml:"Filename,omitempty"`
 	Date                       string `xml:"Date,omitempty"`
-	Reference                  string `xml:"Reference,omitempty"`
-	IfcProject                 string `xml:"IfcProject,attr,omitempty"`
-	IfcSpatialStructureElement string `xml:"IfcSpatialStructureElement,attr,omitempty"`
+	Reference                  string `xml:"Reference"`
+	IfcProject                 string `xml:"IfcProject,attr"`
+	IfcSpatialStructureElement string `xml:"IfcSpatialStructureElement,attr"`
 	IsExternal                 bool `xml:"IsExternal,attr"`
 }
 
@@ -72,10 +86,9 @@ type RelatedTopic struct {
 }
 
 type DocumentReference struct {
-	DocumentGuid string `xml:"DocumentGuid,omitempty"`
-	Url          string `xml:"Url,omitempty"`
+	ReferencedDocument string `xml:"ReferencedDocument,omitempty"`
 	Description  string `xml:"Description,omitempty"`
-	Guid         string `xml:"Guid,attr"`
+	DocumentReference         string `xml:"DocumentReference,attr"`
 }
 
 type Comment struct {
@@ -84,6 +97,7 @@ type Comment struct {
 	Comment               string           `xml:"Comment,omitempty"`
 	Viewpoint             *CommentViewpoint `xml:"Viewpoint,omitempty"`
 	ModifiedDate          string           `xml:"ModifiedDate,omitempty"`
+	ModifiedDateSpecified bool             `xml:"ModifiedDateSpecified,omitempty"`
 	ModifiedAuthor        string           `xml:"ModifiedAuthor,omitempty"`
 	Guid                  string           `xml:"Guid,attr"`
 }
@@ -94,19 +108,17 @@ type CommentViewpoint struct {
 
 //**************************************visinfo*********************************//
 type OrthogonalCamera struct {
-	CameraViewPoint  Point     `xml:"CameraViewPoint"`
-	CameraDirection  Direction `xml:"CameraDirection"`
-	CameraUpVector   Direction `xml:"CameraUpVector"`
+	CameraViewPoint  *Point     `xml:"CameraViewPoint"`
+	CameraDirection  *Direction `xml:"CameraDirection"`
+	CameraUpVector   *Direction `xml:"CameraUpVector"`
 	ViewToWorldScale float64   `xml:"ViewToWorldScale"`
-	AspectRatio      float64   `xml:"AspectRatio"`
 }
 
 type PerspectiveCamera struct {
-	CameraViewPoint Point     `xml:"CameraViewPoint"`
-	CameraDirection Direction `xml:"CameraDirection"`
-	CameraUpVector  Direction `xml:"CameraUpVector"`
+	CameraViewPoint *Point     `xml:"CameraViewPoint"`
+	CameraDirection *Direction `xml:"CameraDirection"`
+	CameraUpVector  *Direction `xml:"CameraUpVector"`
 	FieldOfView     float64   `xml:"FieldOfView"`
-	AspectRatio     float64   `xml:"AspectRatio"`
 }
 
 type Point struct {
@@ -122,6 +134,7 @@ type Direction struct {
 }
 
 type Components struct {
+	ViewSetupHints *ViewSetupHints `xml:"ViewSetupHints,omitempty"`
 	Selection  *ComponentSelection  `xml:"Selection,omitempty"`
 	Visibility *ComponentVisibility `xml:"Visibility,omitempty"`
 	Coloring   *ComponentColoring   `xml:"Coloring>Color,omitempty"`
@@ -131,8 +144,7 @@ type ComponentSelection struct {
 	Component []*Component `xml:"Component,omitempty"`
 }
 type ComponentVisibility struct {
-	ViewSetupHints *ViewSetupHints `xml:"ViewSetupHints,omitempty"`
-	Exceptions      []*Component      `xml:"Exceptions>Component,omitempty"`
+	Exceptions      []*Component      `xml:"Exceptions>Component"`
 	DefaultVisibility      bool      `xml:"DefaultVisibility"`
 }
 
@@ -142,31 +154,31 @@ type ViewSetupHints struct {
 	OpeningsVisible        bool `xml:"OpeningsVisible,attr"`
 }
 type ComponentColoring struct {
-	Components []*Component `xml:"Components>Component"`
+	Component []*Component `xml:"Component"`
 	Color      string      `xml:"Color,attr"`
 }
 
 type Component struct {
 	OriginatingSystem string `xml:"OriginatingSystem,omitempty"`
 	AuthoringToolId   string `xml:"AuthoringToolId,omitempty"`
-	IfcGuid   string `xml:"IfcGuid,omitempty"`
+	IfcGuid   string `xml:"IfcGuid"`
 }
 
 type Line struct {
-	StartPoint Point `xml:"StartPoint"`
-	EndPoint   Point `xml:"EndPoint"`
+	StartPoint *Point `xml:"StartPoint"`
+	EndPoint   *Point `xml:"EndPoint"`
 }
 
 type ClippingPlane struct {
-	Location  Point     `xml:"Location"`
-	Direction Direction `xml:"Direction"`
+	Location  *Point     `xml:"Location"`
+	Direction *Direction `xml:"Direction"`
 }
 
 type Bitmap struct {
 	Format    string    `xml:"Format"`
 	Reference string    `xml:"Reference"`
-	Location  Point     `xml:"Location"`
-	Normal    Direction `xml:"Normal"`
-	Up        Direction `xml:"Up"`
+	Location  *Point     `xml:"Location"`
+	Normal    *Direction `xml:"Normal"`
+	Up        *Direction `xml:"Up"`
 	Height    string    `xml:"Height"`
 }

@@ -1,4 +1,4 @@
-package v3_0
+package v2_1
 
 import (
 	"encoding/xml"
@@ -7,8 +7,9 @@ import (
 )
 
 type ProjectInfo struct {
-	XMLName   xml.Name `xml:"ProjectInfo"`
-	Project *Project `xml:"Project"`
+	XMLName   xml.Name `xml:"ProjectExtension"`
+	Project *Project `xml:"Project,omitempty"`
+	ExtensionSchema string `xml:"ExtensionSchema,omitempty"`
 }
 
 type sProjectInfo struct {

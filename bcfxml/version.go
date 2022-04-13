@@ -9,6 +9,7 @@ import (
 type Version struct {
 	XMLName   xml.Name `xml:"Version"`
 	VersionId string   `xml:"VersionId,attr" json:"version_id"`
+	DetailedVersion string   `xml:"DetailedVersion,omitempty" json:"DetailedVersion"`
 }
 
 type sVersion struct {
